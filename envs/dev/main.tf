@@ -10,22 +10,7 @@ module "vpc" {
 }
 
 ###########################################################
-# 2. AWS Organizations Module
-###########################################################
-module "aws_organizations" {
-  source = "../../modules/aws_organizations"
-}
-
-###########################################################
-# 3. IAM Groups Module
-###########################################################
-module "iam_groups" {
-  source       = "../../modules/iam_groups"
-  project_name = var.project_name
-}
-
-###########################################################
-# 4. Security Group Module
+# 2. Security Group Module
 ###########################################################
 module "security_groups" {
   source       = "../../modules/security_groups"
@@ -34,7 +19,7 @@ module "security_groups" {
 }
 
 ###########################################################
-# 5. ECS Cluster
+# 3. Reference the ECS Cluster
 ###########################################################
 resource "aws_ecs_cluster" "this" {
   name = "${var.project_name}-cluster"
@@ -50,21 +35,18 @@ resource "aws_ecs_cluster" "this" {
 }
 
 ###########################################################
-# 5. ECR Repository for NimbusGate
+# 4. ECR Repository for NimbusGate
 ###########################################################
 module "nimbus_gate_ecr" {
   source = "../../modules/ecr"
 
   repository_name = "nimbus_gate"
   project_name    = var.project_name
-  environment     = "prod"
+  environment     = "dev"
   
-  # For production, we may want immutable tags
-  image_tag_mutability = "IMMUTABLE"
-  
-  # Optional lifecycle policy
+  # Optional lifecycle policy to keep only the latest 10 images
   enable_lifecycle_policy = true
-  max_image_count         = 20
+  max_image_count         = 10
   
   additional_tags = {
     Service = "NimbusGate"
@@ -72,7 +54,7 @@ module "nimbus_gate_ecr" {
 }
 
 ###########################################################
-# 6. Node.js Service Module
+# 5. Node.js Service Module
 ###########################################################
 module "nodejs_service" {
   source = "../../modules/nodejs_service"
@@ -92,7 +74,7 @@ module "nodejs_service" {
   environment_variables = [
     {
       name  = "NODE_ENV"
-      value = "production"
+      value = "development"
     }
   ]
 }
@@ -101,17 +83,17 @@ module "nodejs_service" {
 # Outputs from modules
 ###########################################################
 output "vpc_id" {
-  description = "The VPC ID for prod"
+  description = "The VPC ID for dev"
   value       = module.vpc.vpc_id
 }
 
 output "ecs_cluster_name" {
-  description = "The ECS Cluster Name for prod"
+  description = "The ECS Cluster Name for dev"
   value       = aws_ecs_cluster.this.name
 }
 
 output "ecs_cluster_id" {
-  description = "The ECS Cluster ID for prod"
+  description = "The ECS Cluster ID for dev"
   value       = aws_ecs_cluster.this.id
 }
 
@@ -128,4 +110,4 @@ output "nodejs_alb_dns_name" {
 output "ecr_repository_url" {
   description = "The URL of the ECR repository for NimbusGate"
   value       = module.nimbus_gate_ecr.repository_url
-}
+} 

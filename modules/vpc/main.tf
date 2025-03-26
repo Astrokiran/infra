@@ -13,11 +13,18 @@ resource "aws_internet_gateway" "this" {
     }
 }
 
+# Get available AZs in the region
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 resource "aws_subnet" "public" {
     count = length(var.public_subnets)
     vpc_id = aws_vpc.this.id
     cidr_block = var.public_subnets[count.index]
     map_public_ip_on_launch = true
+    # Assign different AZs to each subnet
+    availability_zone = data.aws_availability_zones.available.names[count.index]
 
     tags = {
         Name = "${var.project_name}-public-subnet-${count.index}"

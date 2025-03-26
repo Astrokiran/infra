@@ -31,5 +31,5 @@ variable "nodejs_certificate_arn" {
 variable "nodejs_desired_count" {
   type        = number
   description = "Number of ECS tasks for Node.js service"
-  default     = 2
-}
+  default     = 1
+} 
