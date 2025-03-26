@@ -13,6 +13,12 @@ variable "public_subnets" {
   description = "Public Subnets for the VPC"
 }
 
+variable "private_subnets" {
+  type        = list(string)
+  description = "Private Subnets for the VPC"
+  default     = ["10.1.3.0/24", "10.1.4.0/24"]
+}
+
 variable "nodejs_container_image" {
   type        = string
   description = "Container image for the Node.js application"
@@ -32,4 +38,20 @@ variable "nodejs_desired_count" {
   type        = number
   description = "Number of ECS tasks for Node.js service"
   default     = 1
+}
+
+variable "aws_region" {
+  type        = string
+  description = "AWS region"
+  default     = "ap-south-1"
+}
+
+variable "your_ip" {
+  type        = string
+  description = "Your IP address for security group access"
+}
+
+variable "key_pair_name" {
+  type        = string
+  description = "Name of the key pair for SSH access"
 } 
