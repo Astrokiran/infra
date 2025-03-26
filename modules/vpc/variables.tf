@@ -17,3 +17,9 @@ variable "public_subnets" {
     error_message = "You must specify at least 2 public subnets for high availability."
   }
 }
+
+variable "private_subnets" {
+  type        = list(string)
+  description = "Private Subnets for the VPC"
+  default     = ["10.1.3.0/24", "10.1.4.0/24"]
+}
